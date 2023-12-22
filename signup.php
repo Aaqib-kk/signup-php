@@ -1,309 +1,202 @@
-<?php session_start();
-include_once 'objects/login.php';
-$login = new Login();
-$CountryDetails = $login->fetchCountryDetails();	
-if(isset($_COOKIE["username"])){
+<?php
+session_start();
+//error_reporting(0);
+include_once 'objects/user.php';
+	 include_once 'objects/login.php';
+	 include_once 'objects/user.php';
+	 include_once 'objects/transaction.php';
+	 include_once 'objects/commission.php';
+	 include_once 'objects/sendMail.php';
+	 include_once 'header.php'; 
 	$login = new Login();
-    // echo "Auction Item is a  " . $_COOKIE["username"];
-	$loginResult = $login->login_COOKIE($_COOKIE["username"]);	
-	// print_r($loginResult);
-	if(!empty($loginResult["username"]) && $loginResult['status']='success'){		
-		header("Location: home.php");
-	} else {
+	$CountryDetails = $login->fetchCountryDetails();
+/* if (! empty($_POST["forgot-password-btn"])) {
 		
-		$cookie_name = "username";
-        $cookie_value ="";
-        setcookie($cookie_name, $cookie_value, time()+0);
-        
-        session_start();
-        unset($_SESSION["cust_logged_in"]);
-	}
+		$login = new Login();
+		$forgotPasswordResponse = $login->forgotPassword();
+} */
+if (! empty($_POST["forgot-password-btn"])) {
+		
+		$login = new Login();
+		$forgotPasswordResponse = $login->sendforgotPasswordOTP();
 }
-if(!empty($_POST["login-btn"])) {
-	 
-	include_once 'objects/login.php';
-	$login = new Login();
-	$loginResult = $login->login();	
-	if(!empty($_SESSION["cust_logged_in"]) && $loginResult['status']='success'){		
-		header("Location: home.php");
-	}	
-}
-if(isset($_POST["signup-btn"])) {
-	include_once 'objects/user.php';
-	$user = new User();
-	$registrationResponse = $user->create();
-	/*!empty($registrationResponse) && $registrationResponse['status']=='success' && */
+if (isset($_POST["verify-otp"])) {
 	
-	/*if($registrationResponse['optstatus']=='success' ){
+		$login = new Login();
+		$verfyOTPDetails = $login->verifyPasswordOTP();
+		//var_dump($verfyOTPDetails);
+		//die; 
+		/* if ($verfyOTPDetails["message"] && $verfyOTPDetails["status"] == "success") {
 
-		header("Location: verify-mobile-otp.php?mobile_no=".$registrationResponse['mobile_no']."");
-	}*/
-	
-}
+			// $url = "my-account.php?status=".$verfyOTPDetails["status"]."&message=".$verfyOTPDetails["message"]."" ;
+			$url = "reset-code.php?reset-code=".$verfyOTPDetails["status"]."&message=".$verfyOTPDetails["message"]."" ;
+			header("Location: $url");
 
-$referral_id ='';
-
-if(isset($_GET['referral_id'])){
-
-	 //echo"---referral_id--11---".$_GET['referral_id']."<br>";
-	if (isset($_COOKIE['referral_id'])) {
-
-		// echo"---referral_id--22---".$_COOKIE['referral_id']."<br>";
-
-		$referral_id = $_COOKIE['referral_id'];
-
-	} else {
-
-		//echo"---referral_id--33---".$_GET["referral_id"]."<br>";
-
-		$refcode=$_GET["referral_id"];
-	    // set cookie, local $uname already set
-		$_COOKIE["referral_id"]=$refcode;
-	   //	echo"---referral_id--33-1--".$_COOKIE["referral_id"]."<br>";
-    	//setcookie( 'referral_id', $refcode, time() +2592000, '/', 'http://localhost/pokergame/index.php' );
-		setcookie('referral_id', $refcode, time()+30*24*60*60);
+		} */
 	}
-
-	$referral_id =$_COOKIE["referral_id"];
-
-	//echo"---referral_id--44---".$referral_id."<br>";
-
-} else if(isset($_COOKIE['referral_id'])){ 
-
-	$referral_id =$_COOKIE["referral_id"];
-    //echo"---referral_id--55---".$referral_id."<br>";
-
-}else{
-
-	$referral_id =''; 
-  // echo"---referral_id--66---".$referral_id."<br>";
-}
- //echo"---referral_id---77--".$referral_id."<br>";
- //die;
-include_once 'header.php';
+	
 ?>
     <head>
-    <title>Tucheze Kadi</title>
+    <title>Forgot Password | Kadi Game</title>
     </head>
 <body>
+    
 
 
-	<!-- start header -->
+    <!-- start header -->
+		<?php include_once 'main-menu.php'; ?>
+		
+  	<!-- #header -->
 
-	<header id="header" class="header-home login-header-mob" >
-		<div class="container">    
 
+
+      <!-- start main section -->
+	 
+
+      
+      <section class=" login-page-bg">
+       
+		<!-- ********* -->
+		<div class="login-card-space"></div>
+		<!-- ********** --> 
+ 
+	    
 		
 
-			</div>
-		</header>
-		<!-- #header -->
-
-
-
-		<section class="login-page-bg">
-
-			<div class="login-page-space">
-
-			</div>
-
-			<div class="container">
-				<div class="row " style="margin-bottom:-30px;">
-					<?php
-					if(!empty($_GET['resetmessage'])){?>
-					
-					
-					
-						<div class="col-sm-6 error-msg text-white text-center"><?php echo $_GET['resetmessage'];?>
-						</div>
-					
-						
-					<?php } ?>
-				</div>
-				<div class="row " style="margin-top: 5%; margin-bottom: 5%;">
-
-					<div class="col-sm-6" style="padding-right: 25px;"> 
-						
-
-						<div class="logo-bg"> 
-							<div class="text-center">
-								<img src="./images/k-logo.png" class="img-fluid logo-poker" alt="">
+ 
+    
+    <section class="change-password">
+        <div class="container">
+           
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-8 ">
+					<!--Form with header passwordValidation();-->
+					<form name="change-password" action="" method="post" onsubmit="return passwordValidation();" style="border: 1px solid white;border-radius: 20px;">
+						<?php
+							if (! empty($forgotPasswordResponse["status"])) {
+								?>
+								<?php
+								if ($forgotPasswordResponse["status"] == "error") {
+									?>
+									<div class="server-response error-msg text-warning"><?php echo $forgotPasswordResponse["message"]; ?></div>
+									<?php
+								} else if ($forgotPasswordResponse["status"] == "success") {
+									?>
+									<div class="server-response success-msg text-white"><?php echo $forgotPasswordResponse["message"]; ?></div>
+									<?php
+								}
+								?>
+								<?php
+							}
+						?>
+						<?php if ($forgotPasswordResponse["status"] == "success") {	?>
+							<div class="card" style="background-color: #222222;border-radius: 20px;">
+								<div class="card-header ">
+									<div class="bg-change-pass text-white text-center py-2">
+										<h3><i class="fa fa-lock"></i> Verify Confirmation Code</h3>
+									</div>
+								</div>
+								<div class="card-body">
+									<div class="form-group">
+										<span class="required error" id="mobile-info"></span>
+										<div class="input-group">  
+											<input type="hidden" name="mobile" id="mobile" class="form-control" value="<?php echo $forgotPasswordResponse['mobile_no']; ?>" placeholder="Enter mobile" readonly>
+										</div>
+									</div>
+									<div class="form-group ">
+										<span class="required error" id="otp-info"></span>
+										<div class="input-group ">
+											<input type="text" name="otp" id="otp" class="form-control"   placeholder="Please enter confirmation code" required="" >
+											<!---onchange="return otpValidate();"--->
+										</div>
+									</div>
+									<div id="timerDiv">Resend Confirmation Code in <span id="timer"></span></div>
+									<div class="should-be-text text-right" id="Resend" style="display:none;">		
+										<a href="#" onclick="return resend_otp();">
+											<i class="fa fa-repeat" aria-hidden="true"></i>
+											Re-send confirmation code
+										</a>
+									</div>
+									<div id="Message_error_msg" class="server-response error-msg text-danger text-right" style="display: none">Message not Sent successfully</div>
+				   						<div id="Message_success_msg" class="server-response success-msg text-success text-right" style="display: none">Message Sent successfully</div>
+								</div>
+								<div class="text-center">
+									<input type="submit" value="Verify" name="verify-otp" id="verify-otp" class="btn send-btn-bg btn-block rounded-0 py-2" >
+								</div>
 							</div>
-							<p class="img-fluid text-center"></p>
-							<h6 class="logo-text text-center">Cheza kadi online</h6>
-								<!--<p  class="img-fluid  text-line" > </p>-->
-						</div>
-					</div>
-					<?php if(!isset($_SESSION["cust_logged_in"]["username"])){ ?> 
-						<div class="col-sm-6 mt-3" style="padding-right: 25px;">
-							 <div class="card tab-card register-bg">
-							  
-								 <!--<div class="card-header tab-card-header">
-									  <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-										<li class="nav-item">
-											<a class="btn register-btn" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true">Login</a>
-										</li>
-										<li class="nav-item ml-5">
-											<a class="btn register-btn" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false">Registration</a>
-										</li>
-										
-									  </ul>
-								</div>
-								
+						<?php } else if($verfyOTPDetails["status"]){ ?> 
 								<?php
-								if (! empty($registrationResponse["status"])) {
-									?>
-									<?php
-									if ($registrationResponse["status"] == "error") {
+									if (! empty($verfyOTPDetails["status"])) {
 										?>
-										<div class="server-response error-msg text-danger"><?php echo $registrationResponse["message"]; ?></div>
 										<?php
-									} else if ($registrationResponse["status"] == "success") {
-										?>
-										<div class="server-response success-msg text-success"><?php echo $registrationResponse["message"]; ?></div>
-										<?php
-									}
-									?>
-									<?php
-								}
-								?>
-								<div class="tab-content" id="myTabContent">
-									<div class="tab-pane fade show" id="one" role="tabpanel" aria-labelledby="one-tab">					
-											
-												<form name="login" action="" method="post" onsubmit="return loginValidation()"> 			  
-													<?php
-													if(!empty($loginResult)){?>
-														<div class="error-msg text-danger"><?php echo $loginResult["message"];?></div>
-													<?php } ?>
-
-
-
-
-													<div class="form-group boxinput">
-														<span class="required error" id="login-username-info"></span>
-														<input type="text" class="form-control box-user" name="login-username" id="login-username" placeholder="username or phone number">
-													</div>
-													<div class="form-group boxinput">
-
-														<span class="required error" id="login-password-info"></span>
-														<input type="password" class="form-control box-user" name="login-password" id="login-password" placeholder="password">
-														<a href="forgot-password.php"><small class="forgot-password ">forgot password ?</small></a>
-													</div>
-													<div class=" text-center" >
-														<input class="login-bg" type="submit" name="login-btn" id="login-btn" value="Login">
-													</div>
-										
-												</form>
-											
-												
-									</div>
-									<div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="two-tab">
-										<form name="sign-up" action="" method="post" onsubmit="return signupValidation()">			  
-											
-
-											<div class="form-group">
-												<span class="required error" id="sign-up-username-info"></span>
-												<input type="test" class="form-control box-user" name="sign-up-username" id="sign-up-username" placeholder="Username">
-											</div>
-											<div class="form-group">
-												<span class="required error" id="mobile-info"></span>
-												<input type="text" class="form-control box-user"  name="mobile" id="mobile" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="10" placeholder="Phone Number">
-												<small class="should-be-text ">*Should be the same number you will use for mobile money</small>
-											</div>
-											<div class="form-group">
-												<span class="required error" id="signup-password-info"></span>
-												<input type="password" class="form-control box-user" name="signup-password" id="signup-password" placeholder="Password">
-											</div>
-											<?php if($referral_id != "" && $referral_id > 0 && $referral_id != NULL) { ?>
-												<div class="form-group">
-													<span class="required error" id="signup-referral_id-info"></span>
-													<input type="text" class="form-control box-user" value="<?php echo $referral_id;?>" readonly name="signup-referral-id" id="signup-referral-id" placeholder="Referral">
-												</div>
-											<?php } ?>
-											<div class=" text-center" >
-												<input class="btn register-btn" type="submit" name="signup-btn" id="signup-btn" value="REGISTER FOR FREE">
-												
-											</div>
-										</form>              
-								  </div>
-
-								</div>-->
-								
-								
-								<div class="row">
-									<div class="col-sm-12 text-center">
-										<button onclick="RegisFun()" class="btn btn-primary1" style=" color: #fff; background-color:#f94707; font-weight: 700; border-radius: 10px;">Register</button> &nbsp;&nbsp;&nbsp;&nbsp;
-										<button onclick="LoginFun()" class="btn btn-primary1" style=" color: black; background-color:#A3A3A3; font-weight: 700; border-radius: 10px;">Login</button>
-									</div>
-									
-								</div>
-								<br>
-								<?php
-								if(!empty($loginResult)){?>
-									<div class="error-msg text-danger"><?php echo $loginResult["message"];?></div>
-								<?php } ?>
-								<?php
-								if (! empty($registrationResponse["status"])) {
-									?>
-									<?php
-									if ($registrationResponse["status"] == "error") {
-										?>
-										<div class="server-response error-msg text-danger"><?php echo $registrationResponse["message"]; ?></div>
-										<?php
-									} else if ($registrationResponse["status"] == "success") {
-										?>
-										<div class="server-response success-msg text-success"><?php echo $registrationResponse["message"]; ?></div>
-										<?php
-									}
-									?>
-									<?php
-								}
-								?>
-								<div id="loginWindow">
-									
-										<form name="login" action="" method="post" onsubmit="return loginValidation()"> 			  
+										if ($verfyOTPDetails["status"] == "error") {
+											?>
+											<div class="server-response error-msg text-warning"><?php echo $forgotPasswordResponse["message"]; ?></div>
 											<?php
-											if(!empty($loginResult)){?>
-												<div class="error-msg text-danger"><?php echo $loginResult["message"];?></div>
-											<?php } ?>
-
-
-
-
-											<div class="form-group">
-												<span class="required error" id="login-username-info"></span>
-												<input type="text" class="form-control box-user" name="login-username" id="login-username" placeholder="username or phone number">
-											</div>
-											<div class="form-group">
-
-												<span class="required error" id="login-password-info"></span>
-												<input type="password" class="form-control box-user" name="login-password" id="login-password" placeholder="password">
-												<a href="forgot-password.php"><small class="forgot-password ">forgot password ?</small></a>
-											</div>
-											<div class=" text-center" >
-												<input class="btn btn-primary1" type="submit" name="login-btn" id="login-btn" value="Login" style="width: 100px; color: #fff; background-color: rgb(249 71 7); border-color: rgb(249 71 7); font-weight: 700;border-radius: 12px;">
-											</div>
+										} else if ($verfyOTPDetails["status"] == "success") {
+											?>
+											<div class="server-response success-msg text-white"><?php echo $verfyOTPDetails["message"]; ?></div>
+											<?php
+										}
+										?>
+										<?php
+									}
+								?>
 								
-										</form>
+								<div class="card">
+								<div class="card-header ">
+									<div class="bg-change-pass text-white text-center py-2">
+										<h3><i class="fa fa-lock"></i> Verify Confirmation Code</h3>
+									</div>
 								</div>
-								<div id="registerWindow" style="display:none">
-									
-										<form name="sign-up" action="" method="post" onsubmit="return signupValidation()">			  
+								<div class="card-body">
+									<div class="form-group">
+										<span class="required error" id="mobile-info"></span>
+										<div class="input-group">  
+											<input type="hidden" name="mobile" id="mobile" class="form-control" value="<?php echo $verfyOTPDetails['mobile_no']; ?>" placeholder="Enter mobile" readonly>
+										</div>
+									</div>
+									<div class="form-group ">
+										<span class="required error" id="otp-info"></span>
+										<div class="input-group ">
+											<input type="text" name="otp" id="otp" class="form-control"   placeholder="Please enter confirmation code" required="" >
+											<!---onchange="return otpValidate();"--->
+										</div>
+									</div>
+									<div id="timerDiv">Resend Confirmation Code in <span id="timer"></span></div>
+									<div class="should-be-text text-right" id="Resend" style="display:none;">		
+										<a href="#" onclick="return resend_otp();">
+											<i class="fa fa-repeat" aria-hidden="true"></i>
+											Re-send confirmation code
+										</a>
+									</div>
+									<div id="Message_error_msg" class="server-response error-msg text-danger text-right" style="display: none">Message not Sent successfully</div>
+				   						<div id="Message_success_msg" class="server-response success-msg text-success text-right" style="display: none">Message Sent successfully</div>
+								</div>
+								<div class="text-center">
+									<input type="submit" value="Verify" name="verify-otp" id="verify-otp" class="btn send-btn-bg btn-block rounded-0 py-2" >
+								</div>
+							</div>
+						
+						<?php } else { ?>
+						<div class="card" style="background-color: #222222;border-radius: 20px;">
+							<div class="card-header ">
+								<div class="bg-change-pass text-white text-center py-2">
+									<h3 style="font-size: 20px;font-weight: 700;"><i class="fa fa-lock"></i> Forgot Password</h3>
+								</div>
+							</div>
+							<div class="card-body ">
+								<!--Body-->
+								<!--<div class="form-group">
+										<span class="required error" id="mobile-info"></span>
+										<input type="text" class="form-control"  name="mobile" id="mobile" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="10" placeholder="Phone Number">
+								</div>
+								-->
+								
+								<div class="row form-group">
 											
-
-											<div class="form-group">
-												<span class="required error" id="sign-up-username-info"></span>
-												<input type="test" class="form-control box-user" name="sign-up-username" id="sign-up-username" placeholder="Username" style="text-transform:lowercase">
-											</div>
-											
-											
-											
-											
-											
-											<div class="row form-group">
-											
-												<div class="col-sm-5">
-													<select id="phone_code" name="phone_code" class="form-control box-user" required>																	
+												<div class="col-sm-5" style="margin-bottom: 10px;">
+													<select id="phone_code" name="phone_code" class="form-control" required style="border-radius: 10px;">																	
 														<?php if($CountryDetails) {
 															foreach($CountryDetails as $country) {
 																
@@ -324,263 +217,268 @@ include_once 'header.php';
 														} ?>
 													</select>
 												</div>
-												<div class="col-sm-7">	
-													<div class="form-group">														
-														<span class="required error" id="mobile-info"></span>
-														<input type="text" class="form-control box-user"  name="mobile" id="mobile" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="12" placeholder="Phone Number">
-														
-													
-													</div>
-													
-												</div>
-											</div>
-											
-											<div class="form-group">
-												<span class="required error" id="signup-password-info"></span>
-												<input type="password" class="form-control box-user" name="signup-password" id="signup-password" placeholder="Password">
-											</div>
-											<?php if($referral_id != "" && $referral_id > 0 && $referral_id != NULL) { ?>
-												<div class="form-group">
-													<span class="required error" id="signup-referral_id-info"></span>
-													<input type="text" class="form-control box-user" value="<?php echo $referral_id;?>" readonly name="signup-referral-id" id="signup-referral-id" placeholder="Referral">
-												</div>
-											<?php } ?>
-											<div class=" text-center" >
-												<input class="btn btn-primary1" type="submit" name="signup-btn" id="signup-btn" value="Finish Registration" style="width: 230px; color: #fff; background-color: rgb(249 71 7); border-color: rgb(249 71 7); font-weight: 700;border-radius: 12px;font-size: 20px;">
 												
+												<div class="col-sm-7">	
+													<div class="form-group input-group">														
+														<span class="required error" id="mobile-info"></span>
+														<input type="text" class="form-control" name="mobile" id="mobile" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="10" placeholder="Enter phone number" style="border-radius: 10px;">
+														<!--<small class="should-be-text ">*Should be the same number you will use for mobile money</small>-->
+													</div>
+												</div>
 											</div>
-										</form>
-								</div>
 								
-							  </div> 
-						</div>
-						<script>
-							document.getElementById("loginWindow").style.display='none';
-							document.getElementById("registerWindow").style.display='none';
-							function LoginFun() {
 								
-								var x = document.getElementById("loginWindow");
-								  if (x.style.display === "none") {
-									x.style.display = "block";
-								  } else {
-									x.style.display = "none";
-								  }
-								  
-								  var x = document.getElementById("registerWindow");
-								  x.style.display = "none";
-								  
-								// document.getElementById("loginWindow").style.display='block';
-							   var element = document.getElementById("loginWindow");
-							   // element.classList.toggle("mystyle");
-							}
-							function RegisFun() {
 								
-								var x = document.getElementById("registerWindow");
-								  if (x.style.display === "none") {
-									x.style.display = "block";
-								  } else {
-									x.style.display = "none";
-								  }
-								  
-								  var x = document.getElementById("loginWindow");
-								  x.style.display = "none";
-								  
-								// document.getElementById("loginWindow").style.display='block';
-							   var element = document.getElementById("registerWindow");
-							   // element.classList.toggle("mystyle");
-							}
-						</script>
-					<?php } else {  ?> 
-						<div class="col-sm-6">
-							<div class="logo-bg"> 
 								<div class="text-center">
-									<a href="my-account.php" class="btn btn-primary" style="width: 125px;">My Account</a>
+									<input type="submit" value="Send Reset Code" name="forgot-password-btn" id="forgot-password-btn" class="btn send-btn-bg py-2" style="color:#ffffff;font-size: 20px;font-weight: 700;border-radius: 10px;">
 								</div>
 							</div>
 						</div>
-					
-					<?php }?> 	
-
-					<div class="col-sm-1">
-
-					</div>
-
+						<?php } ?>
+					</form>
+					<!--Form with header-->
 				</div>
-				
-			
-
-
-<!--<style>
-.profile img {
-    width: 68px;
-    height: 68px;
-    border-radius: 50%
-}
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-</style>-->
-			
-	
-
-
-			</div>
-			        <!-- start footer -->
-		<?php include_once 'footer-index.php'; ?>
-		<!-- end footer -->
-		</section>
+            </div>
+        </div>
+    </section>
 
 
 
+   <!-- start footer -->
+		<?php include_once 'footer.php'; ?>
+    <!-- end footer -->
+    <script>
 
-
-<div class="overlay"></div>
-
-<!-- bs4 js link -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" ></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" ></script>
-<script src="./js/main-index.js" ></script>
-
-<style>
-    .overlay{
-        display: none;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 999;
-         background: rgba(255 255 255 / 10%) url("images/loader1.gif") center no-repeat;
-    }
-    body{
-        text-align: center;
-    }
-    /* Turn off scrollbar when body element has the loading class */
-    body.loading{
-        overflow: hidden;   
-    }
-    /* Make spinner image visible when body element has the loading class */
-    body.loading .overlay{
-        display: block;
-    }
-</style>
-
-<!--<script src="./js/main.js"></script>-->
-<script>
-$('#mobile').keyup(function(e){
-      if($(this).val().match(/^0/)){
-          $(this).val('');
-          return false;
-      }
-});
-$('#mobile').keyup(function(e){
-      if($(this).val().match(/^254/)){
-          $(this).val('');
-          return false;
-      }
-});
-
-$("input#sign-up-username").on({
-  keydown: function(e) {
-    if (e.which === 32)
-      return false;
-  },
-  change: function() {
-    this.value = this.value.replace(/\s/g, "");
-  }
-});
-$("input#login-username").on({
-  keydown: function(e) {
-    if (e.which === 32)
-      return false;
-  },
-  change: function() {
-    this.value = this.value.replace(/\s/g, "");
-  }
-});
-
-	$("#login-div-info").html("").hide();
-	function loginValidation() {
-		var valid = true;
-		$("#login-username").removeClass("error-field");
-		$("#password").removeClass("error-field");
-
-		var UserName = $("#login-username").val();
-		var Password = $('#login-password').val();
-
-		$("#login-username-info").html("").hide();
-
-		if (UserName.trim() == "") {
-			$("#login-username-info").html("required.").css("color", "#ee0000").show();
-			$("#login-username").addClass("error-field");
-			valid = false;
-		}
-		if (Password.trim() == "") {
-			$("#login-password-info").html("required.").css("color", "#ee0000").show();
-			$("#login-password").addClass("error-field");
-			valid = false;
-		}
-		if (valid == false) {
-			$('.error-field').first().focus();
-			valid = false;
-		}
-		return valid;
-	}
-
-	function signupValidation() {
-		var valid = true;
-
-		$("#sign-up-username").removeClass("error-field");
-		$("#mobile").removeClass("error-field");
-		$("#password").removeClass("error-field");
-
-		var UserName = $("#sign-up-username").val();
-		var mobile = $("#mobile").val();
 		
-		var Password = $('#signup-password').val();
+		let timerOn = true;
 
-		$("#sign-up-username-info").html("").hide();
-		if (UserName.trim() == "") {
-			$("#sign-up-username-info").html("required.").css("color", "#ee0000").show();
-			$("#sign-up-username").addClass("error-field");
-			valid = false;
+		function timer(remaining) {
+		  var m = Math.floor(remaining / 60);
+		  var s = remaining % 60;
+		  
+		  m = m < 10 ? '0' + m : m;
+		  s = s < 10 ? '0' + s : s;
+		  document.getElementById('timer').innerHTML = m + ':' + s;
+		  remaining -= 1;
+		  
+		  if(remaining >= 0 && timerOn) {
+			setTimeout(function() {
+				timer(remaining);
+			}, 1000);
+			return;
+		  }
+
+		  if(!timerOn) {
+			// Do validate stuff here
+			return;
+		  }
+		  
+		  // Do timeout stuff here
+		  // alert('Timeout for otp');
+		  
+		  
+		  $("#Resend").show();
+		  $("#timer").hide();
+		  $("#timerDiv").hide();
+		  
+		  
 		}
-		if (mobile.trim() == "") {
+
+		timer(60);
+
+			 
+			function mobileValidation() {
+
+				var valid = true;
+				$("#mobile").removeClass("error-field");
+				var mobile = $("#mobile").val();
+				$("#mobile-info").html("").hide();				
+				if (mobile.trim() == "") {
+					$("#mobile-info").html("required.").css("color", "#ee0000").show();
+					$("#mobile").addClass("error-field");
+					valid = false;
+				}
+				if (valid == false) {
+					$('.error-field').first().focus();
+					valid = false;
+				}
+				return valid;
+			}
+			function otpValidate() {
+
+				var valid = true;
+				var mobile = $("#mobile").val();
+				$("#mobile-info").html("").hide();
+				var otp = $("#otp").val();
+				var cd = $("#cd").val();
+				$("#otp-info").html("").hide();
+
+
+				if (mobile.trim() == "") {
+					$("#mobile-info").html("required.").css("color", "#ee0000").show();
+					$("#mobile").addClass("error-field");
+					valid = false;
+				} else if (otp.trim() == "") {
+					$("#otp-info").html("required.").css("color", "#ee0000").show();
+					$("#otp").addClass("error-field");
+					valid = false;
+						} else {
+						
+						$.ajax({
+
+							method: "POST",
+							url:"ajax_function.php",
+							data: {
+								action: "mobileotpValidate",
+								mobile: mobile,                  
+								otp: otp,                 
+								cd: cd                 
+							},
+							cache: false,
+							success: function(data){
+
+								// console.log("-------data-----"+data);
+								if(data==1){
+									
+								document.getElementById("verify-otp").style.display = "block";
+								return true;
+								} else {
+
+									$("#otp-info").html("Enter valid OTP").css("color", "#ee0000").show();
+									$("#otp").addClass("error-field");
+									$("#otp").val("");
+
+								document.getElementById("verify-otp").style.display = "none";
+									valid = false;
+
+								}						
+							}
+						});
+					}
+				
+			}
+			function resend_otp() {
+				
+				
+				$("#timerDiv").show();
+				$("#timer").show();
+				$("#Resend").hide();
+				timer(60);
+
+				var valid = true;
+				var mobile = $("#mobile").val();
+				// var cd = $("#cd").val();
+				$("#mobile-info").html("").hide();
+
+
+				if (mobile.trim() == "") {
+					$("#mobile-info").html("required.").css("color", "#ee0000").show();
+					$("#mobile").addClass("error-field");
+					valid = false;
+
+				} else {
+						
+						$.ajax({
+
+							method: "POST",
+							url:"ajax_function.php",
+							data: {
+								action: "forgot_resend_otp",
+								mobile: mobile         
+							},
+							cache: false,
+							success: function(data){
+								// console.log("-------data-----"+data);
+								if(data==1){									
+								document.getElementById("Message_success_msg").style.display = "block";								
+								} else {
+								document.getElementById("Message_error_msg").style.display = "block";
+									
+
+								}						
+							}
+						});
+					}
+			}
+		</script>
+    <script>
+	
+	function passwordValidation() {
+		
+		var valid = true;
+
+		$("#mobile").removeClass("error-field");
+		
+		var email = $("#mobile").val();
+		
+		
+		 $("#mobile-info").html("").hide();
+		
+		
+				
+		if (email.trim() == "") {
 			$("#mobile-info").html("required.").css("color", "#ee0000").show();
 			$("#mobile").addClass("error-field");
 			valid = false;
 		}
-		if (Password.trim() == "") {
-			$("#signup-password-info").html("required.").css("color", "#ee0000").show();
-			$("#signup-password").addClass("error-field");
-			valid = false;
-		}
 		if (valid == false) {
 			$('.error-field').first().focus();
 			valid = false;
 		}
-		if (valid == true) {
-			$("body").addClass("loading"); 
-		}
 		return valid;
 	}
-</script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-6XDXBD082F"></script>
-        <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        
-        gtag('config', 'G-6XDXBD082F');
-        </script>
-        
-        
-        
-        
+	function otpValidate() {
+
+				var valid = true;
+				var mobile = $("#mobile").val();
+				$("#mobile-info").html("").hide();
+				var otp = $("#otp").val();
+				$("#otp-info").html("").hide();
+
+
+				if (mobile.trim() == "") {
+					$("#mobile-info").html("required.").css("color", "#ee0000").show();
+					$("#mobile").addClass("error-field");
+					valid = false;
+				} else if (otp.trim() == "") {
+					$("#otp-info").html("required.").css("color", "#ee0000").show();
+					$("#otp").addClass("error-field");
+					valid = false;
+						} else {
+						
+						$.ajax({
+
+							method: "POST",
+							url:"ajax_function.php",
+							data: {
+								action: "mobileotpValidate",
+								mobile: mobile,                  
+								otp: otp                 
+							},
+							cache: false,
+							success: function(data){
+
+								console.log("-------data-----"+data);
+								if(data==1){
+									
+									document.getElementById("verify-otp").style.display = "block";
+									return true;
+									
+								} else {
+
+									$("#otp-info").html("Enter valid OTP").css("color", "#ee0000").show();
+									$("#otp").addClass("error-field");
+									$("#otp").val("");
+
+									document.getElementById("verify-otp").style.display = "none";
+									valid = false;
+
+								}						
+							}
+						});
+					}
+				
+			}
+	</script>
 </body>
 </html>
