@@ -38,6 +38,7 @@ if (isset($_POST["verify-otp"])) {
 ?>
     <head>
     <title>Forgot Password | Kadi Game</title>
+    <script src='https://www.google.com/recaptcha/api.js' async defer></script>
     </head>
 <body>
     
@@ -103,6 +104,7 @@ if (isset($_POST["verify-otp"])) {
 											<input type="hidden" name="mobile" id="mobile" class="form-control" value="<?php echo $forgotPasswordResponse['mobile_no']; ?>" placeholder="Enter mobile" readonly>
 										</div>
 									</div>
+                                    <div class="g-recaptcha" data-sitekey="*******" data-callback="enableBtn"></div>
 									<div class="form-group ">
 										<span class="required error" id="otp-info"></span>
 										<div class="input-group ">
@@ -230,7 +232,7 @@ if (isset($_POST["verify-otp"])) {
 								
 								
 								<div class="text-center">
-									<input type="submit" value="Send Reset Code" name="forgot-password-btn" id="forgot-password-btn" class="btn send-btn-bg py-2" style="color:#ffffff;font-size: 20px;font-weight: 700;border-radius: 10px;">
+									<input type="submit" value="Send Reset Code" name="forgot-password-btn" id="forgot-password-btn" class="btn send-btn-bg py-2" style="color:#ffffff;font-size: 20px;font-weight: 700;border-radius: 10px;" disabled>
 								</div>
 							</div>
 						</div>
@@ -480,5 +482,10 @@ if (isset($_POST["verify-otp"])) {
 				
 			}
 	</script>
+    <script>
+function enableBtn(){
+    document.getElementById("forgot-password-btn").disabled = false;
+}
+</script>
 </body>
 </html>
